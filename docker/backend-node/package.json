@@ -1,0 +1,24 @@
+{
+  "name": "bench-backend-node",
+  "private": true,
+  "scripts": { "build": "tsc -p tsconfig.json" },
+  "dependencies": {
+    "express": "4.21.2",
+    "pino": "9.5.0",
+    "pino-http": "10.3.0",
+    "zod": "3.24.1",
+    "helmet": "8.0.0",
+    "cors": "2.8.5",
+    "jsonwebtoken": "9.0.2",
+    "pg": "8.13.1",
+    "ioredis": "5.4.2",
+    "dotenv": "16.4.7"
+  },
+  "devDependencies": {
+    "@types/express": "5.0.0",
+    "@types/cors": "2.8.17",
+    "@types/jsonwebtoken": "9.0.7",
+    "@types/node": "22.10.2",
+    "typescript": "5.7.2"
+  }
+}
