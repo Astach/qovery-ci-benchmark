@@ -1,0 +1,93 @@
+# Times a container build of an external repository, so heavyweight real-world
+# projects can be compared without vendoring them here.
+#
+# Scope matches benchmark.yml: the build phase only, checkout to image pushed.
+# The repository and commit are inputs so a run is reproducible.
+
+name: external
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: owner/name of the repository to build
+        required: true
+        default: directus/directus
+      ref:
+        description: Branch, tag or commit to build
+        required: true
+        default: main
+      dockerfile:
+        description: Path to the Dockerfile inside that repository
+        required: true
+        default: Dockerfile
+      context:
+        description: Build context inside that repository
+        required: true
+        default: "."
+      runs:
+        description: Repetitions
+        required: true
+        default: "2"
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Check out the target repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.repo }}
+          ref: ${{ inputs.ref }}
+          fetch-depth: 1
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Safe name for the target
+        id: slug
+        run: echo "value=$(echo '${{ inputs.repo }}' | tr '/' '-')" >> "$GITHUB_OUTPUT"
+
+      - name: Record the commit actually built
+        run: git rev-parse HEAD | tee built-commit.txt
+
+      - name: Build, repeated
+        env:
+          RUNS: ${{ inputs.runs }}
+          DOCKERFILE: ${{ inputs.dockerfile }}
+          CONTEXT: ${{ inputs.context }}
+          SLUG: ${{ steps.slug.outputs.value }}
+        run: |
+          set -euo pipefail
+          img="ghcr.io/${GITHUB_REPOSITORY,,}/${SLUG}"
+          echo "run,seconds" > timings.csv
+          for i in $(seq 1 "$RUNS"); do
+            start=$(date +%s)
+            docker buildx build \
+              --file "$DOCKERFILE" \
+              --tag "${img}:bench" \
+              --cache-from "type=gha,scope=${SLUG}" \
+              --cache-to   "type=gha,mode=max,scope=${SLUG}" \
+              --push \
+              "$CONTEXT"
+            end=$(date +%s)
+            echo "$i,$((end - start))" >> timings.csv
+          done
+          cat timings.csv
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: timings-external-${{ steps.slug.outputs.value }}
+          path: |
+            timings.csv
+            built-commit.txt
