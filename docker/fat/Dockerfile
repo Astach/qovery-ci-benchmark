@@ -3,4 +3,4 @@
 # layer compression from compile time. Nothing here is compiled.
 FROM python:3.12-slim
 RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
-CMD ["python", "-c", "import torch; print(torch.__version__)"]
+CMD ["sh", "-c", "python -c 'import torch; print(torch.__version__)' && sleep infinity"]

@@ -10,4 +10,4 @@ FROM alpine:3.21
 RUN --mount=type=secret,id=BENCH_TOKEN \
     test -s /run/secrets/BENCH_TOKEN && \
     echo "token seen, length $(wc -c < /run/secrets/BENCH_TOKEN)" > /result.txt
-CMD ["cat", "/result.txt"]
+CMD ["sh", "-c", "cat /result.txt && sleep infinity"]
