@@ -1,5 +1,5 @@
-# Typical frontend, server-rendered: Next.js with standalone output.
-# Heavier than the SPA - the framework build is CPU-bound on top of the install.
+# Next.js with standalone output. Heavier than the SPA: the framework build is
+# CPU-bound on top of the dependency install.
 FROM node:22-alpine AS build
 WORKDIR /app
 COPY package.json ./

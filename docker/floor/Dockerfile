@@ -1,6 +1,5 @@
-# Case D — the orchestration floor.
-# Nothing to build, so the measured time is queue + provision + registry +
-# clone + push + deploy. If this is slow, no build optimisation will help.
+# Minimal image: there is essentially nothing to build, so a timing of this
+# target is the fixed overhead of the pipeline around the build itself.
 FROM alpine:3.21
 RUN echo "floor" > /floor.txt
 CMD ["sh", "-c", "echo floor && sleep infinity"]

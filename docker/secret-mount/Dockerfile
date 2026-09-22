@@ -1,11 +1,8 @@
-# Case G, treatment — the same work via a BuildKit secret mount.
-# Supported by the Qovery engine since 2026-09-08 (commit d7e6b142f, v1.362.1).
-# Set a Qovery environment variable named BENCH_TOKEN; the engine matches the
-# mount id by name and passes it as --secret. The value never enters a layer.
+# Build-time credential supplied as a BuildKit secret mount.
 #
-# Known interaction: q-core parses ARG names but not mount ids, so a Dockerfile
-# using a secret mount sends tag_build_args = null and loses the pre-clone cache
-# check. Measuring that cost is the point of this pair.
+# The value is exposed as a file for the duration of a single RUN and is not
+# written to any layer, so it does not appear in the image or its history.
+# Pair this with ../secret-arg, which does the same work the leaky way.
 FROM alpine:3.21
 RUN --mount=type=secret,id=BENCH_TOKEN \
     test -s /run/secrets/BENCH_TOKEN && \

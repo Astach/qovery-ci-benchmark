@@ -1,6 +1,5 @@
-# Typical frontend: Vite + React + TypeScript SPA, built then served by nginx.
-# The dependency install dominates, which is the point - that is the layer a
-# better cache backend would remove.
+# Vite + React + TypeScript SPA, built then served by nginx.
+# The dependency install dominates the build time.
 FROM node:22-alpine AS build
 WORKDIR /app
 # Manifest first so a source change does not reinstall the tree.

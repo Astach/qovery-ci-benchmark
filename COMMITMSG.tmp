@@ -1,21 +1,16 @@
-feat(bench): typical frontend and backend application fixtures
+docs(bench): remove internal references and add the timing workflow
 
 What:
-Five fixtures covering the application shapes customers actually deploy: a Vite
-React SPA, a Next.js SSR app, an Express TypeScript API, a FastAPI service, and
-a PHP-FPM stack with composer and a Vite asset build.
+Rewrite the comments and README to describe only what each fixture does
+technically, and add the workflow that times a build on GitHub Actions.
 
 Why:
-The existing targets measure mechanics - fan-out, overhead floor, artifact size,
-secrets. None of them looks like a customer's application, and dependency
-install is what dominates a real build. Without these the benchmark would
-report how Qovery handles contrived work rather than ordinary work.
+This repository is public. Comments previously referenced internal component
+names, a release identifier, a third-party name and internal measurements,
+none of which belong in a public fixture set. The fixtures themselves are
+unchanged; only the prose around them is.
 
 Notes:
-- Versions are pinned exactly, not ranged, so a rerun resolves the same tree.
-- Manifests are copied before sources in every Dockerfile, so a source change
-  does not reinstall dependencies. The PHP one carries a comment saying so,
-  because getting that ordering wrong is the most common cause of slow
-  customer rebuilds we have seen.
-- The PHP stack mirrors a real customer Dockerfile: composer plus pnpm-style
-  asset build, PHP-FPM behind nginx.
+- The workflow measures the build phase only, checkout to image pushed.
+- Two runner sizes, because the cheaper runner is also the smaller one and a
+  single size confounds price with resources.

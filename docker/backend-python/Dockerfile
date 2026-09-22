@@ -1,6 +1,5 @@
-# Typical backend: Python FastAPI with the usual database, cache and crypto
-# dependencies. Several of these ship native wheels, so the install is closer
-# to IO- and CPU-bound than the Node equivalent.
+# Python FastAPI with database, cache and crypto dependencies. Several ship
+# native wheels, so the install is more IO- and CPU-bound than the Node case.
 FROM python:3.12-slim AS build
 WORKDIR /app
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1 PYTHONDONTWRITEBYTECODE=1

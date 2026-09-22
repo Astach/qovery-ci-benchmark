@@ -1,9 +1,7 @@
-# Typical backend, PHP: composer dependencies plus a Vite asset build, served by
-# PHP-FPM behind nginx. This mirrors a real customer stack.
+# composer dependencies plus a Vite asset build, served by PHP-FPM behind nginx.
 #
-# Ordering matters here: manifests are copied before sources in both toolchains,
-# so a source change does not reinstall composer or npm. Getting that wrong is
-# the single most common cause of slow rebuilds we see.
+# Manifests are copied before sources in both toolchains, so a source change
+# does not reinstall composer or npm packages.
 
 FROM composer:2.8 AS vendor
 WORKDIR /build

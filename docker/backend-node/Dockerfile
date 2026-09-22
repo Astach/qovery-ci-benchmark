@@ -1,5 +1,5 @@
-# Typical backend: Node + TypeScript REST API with the usual middleware and
-# database/cache clients. Representative of the most common Qovery service.
+# Node + TypeScript REST API with the usual middleware and database/cache
+# clients. A commonplace backend shape.
 FROM node:22-alpine AS build
 WORKDIR /app
 COPY package.json ./
