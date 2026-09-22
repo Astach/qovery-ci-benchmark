@@ -1,0 +1,11 @@
+ci: run on the standard runner only
+
+What:
+Drop the runner matrix and always use the standard 2-vCPU runner. Also emit the
+timings as a workflow notice, not only as an artifact.
+
+Why:
+Larger runners are not enabled on this account, so the second matrix leg queued
+indefinitely and never produced a result. Any comparison target with more CPU is
+therefore being flattered rather than handicapped, which should be stated
+alongside any number this workflow produces.
