@@ -9,8 +9,9 @@
 #   warm        - same commit rebuilt
 #   incremental - one line changed
 #
-# Two runner sizes, because the cheaper runner is also the smaller one and
-# reporting a single size confounds price with resources.
+# One runner size: the standard 2-vCPU runner. Larger runners are not enabled
+# on this account, so any comparison target with more CPU is being flattered,
+# not handicapped. State that alongside any result.
 
 name: benchmark
 
@@ -36,11 +37,7 @@ permissions:
 
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        runner: [ubuntu-latest, ubuntu-latest-4-cores]
-    runs-on: ${{ matrix.runner }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -82,10 +79,10 @@ jobs:
             end=$(date +%s.%N)
             printf '%s,%.1f\n' "$i" "$(echo "$end - $start" | bc)" >> timings.csv
           done
-          echo "--- ${TARGET} on ${{ matrix.runner }} (${{ inputs.variant }}) ---"
+          echo "::notice::${TARGET} ${{ inputs.variant }} $(tr '\n' ' ' < timings.csv)"
           cat timings.csv
 
       - uses: actions/upload-artifact@v4
         with:
-          name: timings-${{ inputs.target }}-${{ inputs.variant }}-${{ matrix.runner }}
+          name: timings-${{ inputs.target }}-${{ inputs.variant }}-ubuntu-latest
           path: timings.csv
