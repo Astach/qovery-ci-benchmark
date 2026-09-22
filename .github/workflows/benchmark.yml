@@ -59,6 +59,12 @@ jobs:
           f=$(find docker/${{ inputs.target }} -name '*.go' -o -name '*.ts' -o -name '*.tsx' 2>/dev/null | head -1)
           [ -n "$f" ] && printf '\n// bench %s\n' "$(date +%s)" >> "$f" || true
 
+      - name: Safe name for the target
+        id: slug
+        run: echo "value=${TARGET//\//-}" >> "$GITHUB_OUTPUT"
+        env:
+          TARGET: ${{ inputs.target }}
+
       - name: Build, repeated
         env:
           TARGET: ${{ inputs.target }}
@@ -84,5 +90,5 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: timings-${{ inputs.target }}-${{ inputs.variant }}-ubuntu-latest
+          name: timings-${{ steps.slug.outputs.value }}-${{ inputs.variant }}
           path: timings.csv

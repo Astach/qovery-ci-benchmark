@@ -1,11 +1,10 @@
-ci: run on the standard runner only
+ci: derive a slash-free artifact name from the target
 
 What:
-Drop the runner matrix and always use the standard 2-vCPU runner. Also emit the
-timings as a workflow notice, not only as an artifact.
+Compute a sanitised slug for the build target and use it in the artifact name.
 
 Why:
-Larger runners are not enabled on this account, so the second matrix leg queued
-indefinitely and never produced a result. Any comparison target with more CPU is
-therefore being flattered rather than handicapped, which should be stated
-alongside any number this workflow produces.
+Targets are paths, so a nested one such as `mono/svc-1` produced an artifact
+name containing a forward slash, which the upload rejects. The builds
+themselves succeeded; only the upload failed, which lost the timings the run
+existed to collect.
