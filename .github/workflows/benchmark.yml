@@ -1,0 +1,91 @@
+# Times a container build on GitHub Actions so the result can be compared with
+# other CI systems.
+#
+# Scope: the build phase only, from checkout to image pushed to a registry.
+# Anything a platform does beyond that is measured separately, never folded in.
+#
+# Cache variants, matching how builds actually arrive:
+#   cold        - no cache
+#   warm        - same commit rebuilt
+#   incremental - one line changed
+#
+# Two runner sizes, because the cheaper runner is also the smaller one and
+# reporting a single size confounds price with resources.
+
+name: benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Build target under docker/
+        required: true
+        default: floor
+      variant:
+        description: cold | warm | incremental
+        required: true
+        default: cold
+      runs:
+        description: Repetitions
+        required: true
+        default: "5"
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-latest, ubuntu-latest-4-cores]
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clear cache for the cold variant
+        if: ${{ inputs.variant == 'cold' }}
+        run: docker buildx prune -af
+
+      - name: Touch a line for the incremental variant
+        if: ${{ inputs.variant == 'incremental' }}
+        run: |
+          f=$(find docker/${{ inputs.target }} -name '*.go' -o -name '*.ts' -o -name '*.tsx' 2>/dev/null | head -1)
+          [ -n "$f" ] && printf '\n// bench %s\n' "$(date +%s)" >> "$f" || true
+
+      - name: Build, repeated
+        env:
+          TARGET: ${{ inputs.target }}
+          RUNS: ${{ inputs.runs }}
+        run: |
+          set -euo pipefail
+          img="ghcr.io/${GITHUB_REPOSITORY,,}/${TARGET//\//-}"
+          echo "run,seconds" > timings.csv
+          for i in $(seq 1 "$RUNS"); do
+            start=$(date +%s.%N)
+            docker buildx build \
+              --file "docker/${TARGET}/Dockerfile" \
+              --tag "${img}:${GITHUB_SHA}" \
+              --cache-from "type=gha,scope=${TARGET}" \
+              --cache-to   "type=gha,mode=max,scope=${TARGET}" \
+              --push \
+              "docker/${TARGET}"
+            end=$(date +%s.%N)
+            printf '%s,%.1f\n' "$i" "$(echo "$end - $start" | bc)" >> timings.csv
+          done
+          echo "--- ${TARGET} on ${{ matrix.runner }} (${{ inputs.variant }}) ---"
+          cat timings.csv
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: timings-${{ inputs.target }}-${{ inputs.variant }}-${{ matrix.runner }}
+          path: timings.csv
