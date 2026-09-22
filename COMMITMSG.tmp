@@ -1,10 +1,15 @@
-ci: derive a slash-free artifact name from the target
+ci: add a workflow for building external repositories
 
 What:
-Compute a sanitised slug for the build target and use it in the artifact name.
+A second workflow that checks out a named repository at a named ref and times a
+container build of it, recording the commit actually built.
 
 Why:
-Targets are paths, so a nested one such as `mono/svc-1` produced an artifact
-name containing a forward slash, which the upload rejects. The builds
-themselves succeeded; only the upload failed, which lost the timings the run
-existed to collect.
+The heavyweight comparison targets are large upstream projects. Vendoring them
+here would be unmanageable and would drift from upstream; pointing a workflow at
+them keeps the fixture set small and the comparison honest.
+
+Notes:
+- Same scope as the existing workflow: the build phase only.
+- The built commit is recorded as an artifact, because a branch ref moves and a
+  rerun months later would otherwise not be comparable.
