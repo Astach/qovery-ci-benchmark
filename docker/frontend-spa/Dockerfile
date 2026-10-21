@@ -14,3 +14,5 @@ COPY --from=build /app/dist /usr/share/nginx/html
 EXPOSE 80
 
 # oct rerun frontend-spa cold 1
+
+# oct rerun frontend-spa cold 2
