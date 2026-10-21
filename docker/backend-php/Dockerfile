@@ -27,3 +27,5 @@ COPY --from=vendor /build/vendor vendor
 COPY --from=assets /build/public/build public/build
 EXPOSE 80
 CMD ["entrypoint.sh"]
+
+# oct rerun backend-php cold 1
