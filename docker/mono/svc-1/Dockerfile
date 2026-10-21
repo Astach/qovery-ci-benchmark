@@ -10,3 +10,5 @@ FROM alpine:3.21
 COPY --from=build /out/svc /usr/local/bin/svc
 EXPOSE 8080
 CMD ["svc"]
+
+# oct rerun mono 1
