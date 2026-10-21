@@ -18,3 +18,5 @@ createRoot(document.getElementById("root")!).render(
     </QueryClientProvider>
   </StrictMode>,
 );
+
+// oct rerun frontend-spa warm 1
