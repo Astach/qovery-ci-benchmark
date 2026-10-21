@@ -5,3 +5,5 @@ RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/wh
 CMD ["sh", "-c", "python -c 'import torch; print(torch.__version__)' && sleep infinity"]
 
 # oct rerun fat cold 1
+
+# oct rerun fat cold 2
