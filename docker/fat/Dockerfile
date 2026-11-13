@@ -15,3 +15,5 @@ CMD ["sh", "-c", "python -c 'import torch; print(torch.__version__)' && sleep in
 # oct rerun fat warm 2
 
 # nov rerun fat cold 1
+
+# nov rerun fat cold 2
